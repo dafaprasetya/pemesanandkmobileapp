@@ -1,6 +1,6 @@
 import 'package:intl/intl.dart';
 
-class ProductModel {
+class SearchProdModel {
   final String id;
   final String namaProduk;
   final String harga;
@@ -9,6 +9,7 @@ class ProductModel {
   final String satuan;
   final String kategori;
   final String grup;
+
   static String formatRupiah(dynamic nominal) {
     final currencyFormatter = NumberFormat.currency(
       locale: 'id_ID',
@@ -17,7 +18,7 @@ class ProductModel {
     );
     return currencyFormatter.format(int.tryParse(nominal.toString()) ?? 0);
   }
-  ProductModel({
+  SearchProdModel({
     required this.id,
     required this.namaProduk,
     required this.harga,
@@ -28,9 +29,9 @@ class ProductModel {
     required this.grup,
   });
 
-  factory ProductModel.fromJson(Map<String, dynamic> json) {
+  factory SearchProdModel.fromJson(Map<String, dynamic> json) {
     String hargaMitra = formatRupiah(json['harga_mitra']);
-    return ProductModel(
+    return SearchProdModel(
       
       id: json['barang_id'] ?? '',
       namaProduk: json['nama_produk'] ?? '',

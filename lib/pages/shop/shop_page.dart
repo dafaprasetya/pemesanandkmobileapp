@@ -3,6 +3,7 @@ import 'package:pemesanandk/misc/misc.dart';
 import 'package:pemesanandk/pages/shop/model/SelectedProduct.dart';
 import 'package:pemesanandk/pages/shop/search_shop.dart';
 import 'package:pemesanandk/pages/shop/backend/shop.dart';
+import 'package:intl/intl.dart';
 import 'package:flutter/services.dart';
 
 class ShopPage extends StatelessWidget {
@@ -31,9 +32,21 @@ class __ShopState extends State<_Shop> {
     });
     // getProduct(context)
   }
-  bool _showPopup = false;
-  List<SelectedProduct> selectedItems = [];
+
   
+  // List<SelectedProduct> selectedItem = [];
+  
+  Future<void> _handleRefresh() async {
+    // Simulasi delay 2 detik (misal ambil data dari API)
+    await Future.delayed(Duration(seconds: 2));
+
+    // Jalankan logika yang ingin kamu lakukan, misalnya fetch data baru
+    setState(() {
+      getProductSearch(context, () {
+        setState(() {});
+      });
+    });
+  }
 
   Widget build(BuildContext context) {
     return Scaffold(
@@ -95,87 +108,98 @@ class __ShopState extends State<_Shop> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Expanded(child: ListView.builder(
+                    Expanded(child: 
+                    RefreshIndicator(onRefresh: _handleRefresh, 
+                    child: 
+                    GridView.builder(
+                      padding: const EdgeInsets.all(10),
+                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,          // Jumlah kolom = 2
+                        crossAxisSpacing: 10,       // Jarak antar kolom
+                        mainAxisSpacing: 10,        // Jarak antar baris
+                        childAspectRatio: 4 / 5,    // Rasio lebar:tinggi
+                      ),
                       itemCount: products.length,
                       itemBuilder: (context, index) {
                       var prod = products[index];
                       return
+                      GestureDetector(
+                        onTap: () {
+                          SelectedProduct selected = SelectedProduct(
+                            id: prod.id,
+                            namaProduk: prod.namaProduk,
+                            harga: prod.harga,
+                            hargaraw: prod.hargaraw,
+                            stok: prod.stok,
+                            satuan: prod.satuan,
+                          );
+                          setState(() {
+                            showPopup = !showPopup;
+                            selectedItem.add(selected);
+                          });
+                        },
+                        child: 
                         Card(
                           child: Padding(
                           padding:  EdgeInsets.all(12.0),
-                          child: Row(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(8),
-                                child: Image.asset("assets/logo/logo.png", width: 100,)
-                              ),
-                              SizedBox(width: 12),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      '${prod.namaProduk}',
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                        decoration: TextDecoration.none
-                                      ),
-                                    ),
-                                    SizedBox(height: 8),
-                                    Text(
-                                      'Harga: Rp. ${prod.harga}',
-                                      maxLines: 3,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: TextStyle(
-                                        decoration: TextDecoration.none
-                                      ),
-                                    ),
-                                    Text(
-                                      'Stok: ${prod.stok}',
-                                      maxLines: 3,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: TextStyle(
-                                        decoration: TextDecoration.none
-                                      ),
-                                    ),
-                                    Center(
-                                      child: 
-                                      ElevatedButton(
-                                        onPressed: (){
-                                          SelectedProduct selected = SelectedProduct(
-                                            id: prod.id,
-                                            namaProduk: prod.namaProduk,
-                                            harga: prod.harga,
-                                            stok: prod.stok,
-                                          );
-                                          setState(() {
-                                            _showPopup = !_showPopup;
-                                            selectedItems.add(selected);
-                                          });
-                                          
-                                        }, 
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor: const Color.fromARGB(255, 136, 136, 136),
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(10),
-                                          ),
-                                          minimumSize: Size(200,30)
-                                        ),
-                                        child: Text('Tambah ke keranjang', style: TextStyle(color: Colors.white, fontSize: 15,),),
-                                      )
-                                    ),
-                                  ],
+                              Center(
+                                child: 
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(8),
+                                  child: Image.asset("assets/logo/logo_background.png", width: 60,)
                                 ),
                               ),
+                              SizedBox(height: 12),
+                              Text(
+                                '${prod.namaProduk}',
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.bold,
+                                  decoration: TextDecoration.none
+                                ),
+                              ),
+                              SizedBox(height: 6),
+                              Text(
+                                '${prod.harga}/${prod.satuan}',
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  color:  const Color(0xFFE53935),
+                                  fontWeight: FontWeight.bold,
+                                  decoration: TextDecoration.none
+                                ),
+                              ),
+                              Text(
+                                'Stok: ${prod.stok}',
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  decoration: TextDecoration.none
+                                ),
+                              ),
+                              Text(
+                                '${prod.kategori} - ${prod.grup}',
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  decoration: TextDecoration.none
+                                ),
+                              ),
+                              
                             ],
                           ),
                         ),
-                        );
+                        )
+                      );
 
                       }
                       
-                    )
+                    ))
                     )
                   ],
                 ),
@@ -184,28 +208,43 @@ class __ShopState extends State<_Shop> {
             
           )
           ),
-          if (_showPopup)
+          
+          if (showPopup)
           AnimatedOpacity(
             duration: Duration(milliseconds: 300),
-            opacity: _showPopup ? 0.5 : 0.0,
-            child: Container(
-              color: Colors.black,
-              width: double.infinity,
-              height: double.infinity,
-            ),
+            opacity: showPopup ? 0.5 : 0.0,
+            child: 
+            GestureDetector(
+              onTap: () {
+                setState(() {
+                  showPopup = false;
+                  selectedItem = [];
+                  total = '0';
+                  jumlahController.text = '0';
+                });
+              },
+              child: 
+                Container(
+                  color: Colors.black,
+                  width: double.infinity,
+                  height: double.infinity,
+                ),
+            )
           ),
 
           AnimatedPositioned(
             duration: Duration(milliseconds: 200),
             curve: Curves.easeOut,
-            bottom: _showPopup ? 0 : -300,
+            bottom: showPopup ? 0 : -300,
             left: 0,
             right: 0,
             child: AnimatedOpacity(
               duration: Duration(milliseconds: 300),
-              opacity: _showPopup ? 1.0 : 0.0,
+              opacity: showPopup ? 1.0 : 0.0,
               
-              child: Container(
+              child: 
+              
+              Container(
                 height: MediaQuery.of(context).size.height * 0.35,
                 width: MediaQuery.of(context).size.width,
                 padding: EdgeInsets.all(16),
@@ -225,9 +264,9 @@ class __ShopState extends State<_Shop> {
                 ),
                 child: 
                 ListView.builder(
-                    itemCount: selectedItems.length,
+                    itemCount: selectedItem.length,
                     itemBuilder: (context, index) {
-                    var prod = selectedItems[index];
+                    var prod = selectedItem[index];
                     return
 
                     Column(
@@ -244,37 +283,60 @@ class __ShopState extends State<_Shop> {
                             ),
                           ),
                         ),
-                        SizedBox(height: 12),
-                        Text('stok: ${prod.stok}'),
+                        Center(
+                          child: 
+                          Text('${prod.harga}/${prod.satuan}',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 15,
+                              decoration: TextDecoration.none
+                            ),
+                          ),
+                        ),
                         SizedBox(height: 6),
-                        Text('harga: ${prod.harga}'),
-                        SizedBox(height: 15),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            
+                            Text('Stok: ${prod.stok}'),
+                            Text('Total: ${formatRupiah(total)}'),
+
+                          ],
+                        ),
+                        SizedBox(height: 30),
                         Row(
                           children: [
                             Expanded(child: 
                               ElevatedButton(
                                 onPressed: () {
                                   jumlahController.text = (int.parse(jumlahController.text)-1).toString();
+                                  setState(() {
+                                    total = (int.parse(total) - int.parse(prod.hargaraw)).toString();
+                                  });
                                 },
                                 style: ElevatedButton.styleFrom(
                                   shape: const CircleBorder(),
                                   padding: const EdgeInsets.all(20), // Ukuran button
-                                  backgroundColor: const Color.fromARGB(255, 136, 136, 136), // Warna button
+                                  backgroundColor: const Color.from(alpha: 1, red: 0.878, green: 0.878, blue: 0.878), // Warna button
                                 ),
-                                child: const Icon(Icons.remove, color: Colors.white),
+                                child: const Icon(Icons.remove, color: const Color(0xFF212121)),
                               )
                             ),
                             Expanded(child: 
                               TextField(
                                 controller: jumlahController,
                                 keyboardType: TextInputType.number,
+                                onChanged: (value) {
+                                  setState(() {
+                                    total = (int.parse(jumlahController.text) * int.parse(prod.hargaraw)).toString();
+                                  });
+                                },
                                 inputFormatters: [
                                   FilteringTextInputFormatter.digitsOnly,
                                 ],
                                 decoration: InputDecoration(
-                                  hintText: "Masukan jumlah yang ingin dimasukan ke keranjang",
+                                  hintText: "jumlah",
                                   filled: true,
-                                  
                                   fillColor: Colors.grey[300],
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(10),
@@ -287,42 +349,60 @@ class __ShopState extends State<_Shop> {
                               ElevatedButton(
                                 onPressed: () {
                                   jumlahController.text = (int.parse(jumlahController.text)+1).toString();
+                                  setState(() {
+                                    total = (int.parse(prod.hargaraw) * int.parse(jumlahController.text)).toString();
+                                  });
                                 },
                                 style: ElevatedButton.styleFrom(
                                   shape: const CircleBorder(),
                                   padding: const EdgeInsets.all(20), // Ukuran button
-                                  backgroundColor: const Color.fromARGB(255, 136, 136, 136), // Warna button
+                                  backgroundColor: const Color.from(alpha: 1, red: 0.878, green: 0.878, blue: 0.878), // Warna button
                                 ),
-                                child: const Icon(Icons.add, color: Colors.white),
+                                child: const Icon(Icons.add, color: const Color(0xFF212121)),
                               )
                             ),
                           ],
                         ),
-                        SizedBox(height: 12),
+                        SizedBox(height: 30),
                         Center(
                           child: Row(
                             children: [
                               Expanded(child: 
                                 ElevatedButton(
+                                  style: 
+                                  ElevatedButton.styleFrom(
+                                    minimumSize: Size(200, 50), // Lebar dan tinggi
+                                    shadowColor: Colors.transparent,
+                                    backgroundColor: const Color.fromARGB(255, 230, 230, 230)
+                                  ),
                                   onPressed: () {
                                     FocusScope.of(context).unfocus();
                                     setState(() {
-                                      _showPopup = false;
-                                      selectedItems = [];
+                                      showPopup = false;
+                                      selectedItem = [];
+                                      jumlahController.text = '0';
+                                      total = '0';
                                     });
+                                    
                                   },
-                                  child: Text('Batal'),
+                                  child: Text('Batal', style: TextStyle(color: Colors.black),),
                                 ),
                               ),
                               Expanded(child: 
                                 ElevatedButton(
-                                  onPressed: () {
+                                  style: ElevatedButton.styleFrom(
+                                    minimumSize: Size(200, 50), // Lebar dan tinggi
+                                    shadowColor: Colors.transparent,
+                                    backgroundColor: const Color(0xFFE53935)
+                                  ),
+                                   
+
+                                  onPressed: processedKeranjang ? null : () {
                                     FocusScope.of(context).unfocus();
-                                    setState(() {
-                                      _showPopup = false;
-                                    });
+                                    addToCart(context, (){setState(() {});}, prod.id, jumlahController.text);
+                                    
                                   },
-                                  child: Text('Tambah'),
+                                  child: Text('Tambah',style: TextStyle(color: const Color(0xFFFDD835)),),
                                 ),
                               ),
                             ],
@@ -330,11 +410,112 @@ class __ShopState extends State<_Shop> {
                         ),
                       ],
                     );}
-                  
                 )
               ),
             ),
           ),
+
+          if (successKeranjang)
+          Visibility(
+            visible: successKeranjang,
+            child: 
+            Padding(
+              padding: EdgeInsets.only(
+                bottom: 20,
+              ),
+              child: 
+              Align(
+                alignment: Alignment.bottomCenter,
+                child: 
+                Container(
+                  height: MediaQuery.of(context).size.height * 0.05,
+                  width: MediaQuery.of(context).size.width * 0.80,
+                  padding: EdgeInsets.only(
+                    bottom: 10,
+                    left: 20,
+                    right: 20,
+                    top: 10,
+
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(30),
+                      topRight: Radius.circular(30),
+                      bottomRight: Radius.circular(30),
+                      bottomLeft: Radius.circular(30),
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        blurRadius: 12,
+                        color: Colors.black26,
+                        offset: Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: 
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text("Produk ditambahkan ke keranjang"),
+                      Icon(Icons.check_circle_sharp, color: const Color.fromARGB(255, 53, 229, 112),),
+                    ],
+                  )
+                ),
+              ),
+            ),
+          ),
+          if (errorKeranjang)
+          Visibility(
+            visible: errorKeranjang,
+            child: 
+            Padding(
+              padding: EdgeInsets.only(
+                bottom: 20,
+              ),
+              child: 
+              Align(
+                alignment: Alignment.bottomCenter,
+                child: 
+                Container(
+                  height: MediaQuery.of(context).size.height * 0.05,
+                  width: MediaQuery.of(context).size.width * 0.80,
+                  padding: EdgeInsets.only(
+                    bottom: 10,
+                    left: 20,
+                    right: 20,
+                    top: 10,
+
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(30),
+                      topRight: Radius.circular(30),
+                      bottomRight: Radius.circular(30),
+                      bottomLeft: Radius.circular(30),
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        blurRadius: 12,
+                        color: Colors.black26,
+                        offset: Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: 
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text("Terjadi kesalahan, coba lagi"),
+                      Icon(Icons.close_rounded, color: const Color(0xFFE53935),),
+                    ],
+                  )
+                ),
+              ),
+            ),
+          ),
+          
         ],
       ),
     );

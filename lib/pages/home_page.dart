@@ -170,7 +170,7 @@ class _HPageState extends State<HPage> {
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
-        selectedItemColor: const Color(0xFFFA2B28),
+        selectedItemColor: const Color(0xFFE53935),
         unselectedItemColor: Colors.grey,
         items:[
           BottomNavigationBarItem(
