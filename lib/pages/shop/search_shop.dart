@@ -1,9 +1,8 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:pemesanandk/misc/misc.dart';
-import 'package:pemesanandk/pages/shop/backend/shop.dart';
 import 'package:pemesanandk/pages/shop/model/SelectedProduct.dart';
+import 'package:pemesanandk/pages/shop/search_shop.dart';
+import 'package:pemesanandk/pages/shop/backend/shop.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/services.dart';
 
@@ -12,50 +11,36 @@ class SearchShopPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _SearchShop();
+    return _Searchshop();
   }
 }
 
-class _SearchShop extends StatefulWidget {
-  const _SearchShop({super.key});
+class _Searchshop extends StatefulWidget {
+  const _Searchshop({super.key});
 
   @override
-  State<_SearchShop> createState() => __SearchShopState();
+  State<_Searchshop> createState() => __SearchshopState();
 }
 
-class __SearchShopState extends State<_SearchShop> {
-  
+class __SearchshopState extends State<_Searchshop> {
   @override
-  
   void initState() {
+    // TODO: implement initState
     super.initState();
-    prodSearchEmpty = false;
-    isloadingProdSearch= !isloadingProdSearch; 
-
-    // productSearch = [];
     getProductSearch(context, () {
       setState(() {});
     });
-    
+    // getProduct(context)
   }
-  bool showNotif = false;
 
-  void showTemporaryNotif() {
-    setState(() {
-      showNotif = true;
-    });
-
-    Future.delayed(Duration(seconds: 2), () {
-      setState(() {
-        showNotif = false;
-      });
-    });
-  }
-  bool _showPopup = false;
+  
   // List<SelectedProduct> selectedItem = [];
+  
   Future<void> _handleRefresh() async {
+    // Simulasi delay 2 detik (misal ambil data dari API)
     await Future.delayed(Duration(seconds: 2));
 
+    // Jalankan logika yang ingin kamu lakukan, misalnya fetch data baru
     setState(() {
       getProductSearch(context, () {
         setState(() {});
@@ -66,7 +51,7 @@ class __SearchShopState extends State<_SearchShop> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: const Color.fromARGB(255, 255, 255, 255),
         elevation: 0,
         title:
         Row(
@@ -84,12 +69,12 @@ class __SearchShopState extends State<_SearchShop> {
                   controller: searchController,
                     onSubmitted: (value) {
                       Navigator.push(
-                        context,
+                        context, 
                         MaterialPageRoute(builder: (context) => SearchShopPage()),
                       );
                     },
                   decoration: InputDecoration(
-                    hintText: 'Hasil Pencarian ${searchController.text}',
+                    hintText: 'Cari',
                     border: InputBorder.none,
                     icon: Icon(Icons.search),
                   ),
@@ -109,13 +94,13 @@ class __SearchShopState extends State<_SearchShop> {
         )
       ),
       
-      body: 
+      body:
       Stack(
         children: [
           Padding( 
             padding: EdgeInsets.symmetric(horizontal: 10, vertical: 0),
             child:
-            isloadingProduct ? CircularProgressIndicator() : 
+            isloadingProduct ? Center(child:CircularProgressIndicator(color: const Color(0xFFE53935),)) : 
             Stack(
             children: [
               Align(
@@ -123,17 +108,17 @@ class __SearchShopState extends State<_SearchShop> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    prodSearchEmpty ? Align(alignment: Alignment.center, child: Text('Produk Tidak Ditemukan'),) : 
-                    
                     Expanded(child: 
-                    RefreshIndicator(onRefresh: _handleRefresh, 
+                    RefreshIndicator(
+                      color: const Color(0xFFE53935),
+                      onRefresh: _handleRefresh, 
                     child: 
                     GridView.builder(
                       padding: const EdgeInsets.all(10),
                       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 2,          // Jumlah kolom = 2
-                        crossAxisSpacing: 10,       // Jarak antar kolom
-                        mainAxisSpacing: 10,        // Jarak antar baris
+                        crossAxisSpacing: 0,       // Jarak antar kolom
+                        mainAxisSpacing: 0,        // Jarak antar baris
                         childAspectRatio: 4 / 5,    // Rasio lebar:tinggi
                       ),
                       itemCount: productSearch.length,
@@ -151,7 +136,7 @@ class __SearchShopState extends State<_SearchShop> {
                             satuan: prod.satuan,
                           );
                           setState(() {
-                            _showPopup = !_showPopup;
+                            showPopup = !showPopup;
                             selectedItem.add(selected);
                           });
                         },
@@ -180,6 +165,7 @@ class __SearchShopState extends State<_SearchShop> {
                                   decoration: TextDecoration.none
                                 ),
                               ),
+                              SizedBox(height: 6),
                               Text(
                                 '${prod.harga}/${prod.satuan}',
                                 maxLines: 1,
@@ -224,15 +210,16 @@ class __SearchShopState extends State<_SearchShop> {
             
           )
           ),
-          if (_showPopup)
+          
+          if (showPopup)
           AnimatedOpacity(
             duration: Duration(milliseconds: 300),
-            opacity: _showPopup ? 0.5 : 0.0,
+            opacity: showPopup ? 0.5 : 0.0,
             child: 
             GestureDetector(
               onTap: () {
                 setState(() {
-                  _showPopup = false;
+                  showPopup = false;
                   selectedItem = [];
                   total = '0';
                   jumlahController.text = '0';
@@ -250,14 +237,16 @@ class __SearchShopState extends State<_SearchShop> {
           AnimatedPositioned(
             duration: Duration(milliseconds: 200),
             curve: Curves.easeOut,
-            bottom: _showPopup ? 0 : -300,
+            bottom: showPopup ? 0 : -300,
             left: 0,
             right: 0,
             child: AnimatedOpacity(
               duration: Duration(milliseconds: 300),
-              opacity: _showPopup ? 1.0 : 0.0,
+              opacity: showPopup ? 1.0 : 0.0,
               
-              child: Container(
+              child: 
+              
+              Container(
                 height: MediaQuery.of(context).size.height * 0.35,
                 width: MediaQuery.of(context).size.width,
                 padding: EdgeInsets.all(16),
@@ -348,9 +337,8 @@ class __SearchShopState extends State<_SearchShop> {
                                   FilteringTextInputFormatter.digitsOnly,
                                 ],
                                 decoration: InputDecoration(
-                                  hintText: "Jumlah",
+                                  hintText: "jumlah",
                                   filled: true,
-                                  
                                   fillColor: Colors.grey[300],
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(10),
@@ -392,7 +380,7 @@ class __SearchShopState extends State<_SearchShop> {
                                   onPressed: () {
                                     FocusScope.of(context).unfocus();
                                     setState(() {
-                                      _showPopup = false;
+                                      showPopup = false;
                                       selectedItem = [];
                                       jumlahController.text = '0';
                                       total = '0';
@@ -409,16 +397,15 @@ class __SearchShopState extends State<_SearchShop> {
                                     shadowColor: Colors.transparent,
                                     backgroundColor: const Color(0xFFE53935)
                                   ),
-                                  onPressed: () {
+                                   
+
+                                  onPressed: processedKeranjang ? null : () {
                                     FocusScope.of(context).unfocus();
-                                    setState(() {
-                                      _showPopup = false;
-                                      selectedItem = [];
-                                      total = '0';
-                                      jumlahController.text = '0';
-                                    });
+                                    addToCart(context, (){setState(() {});}, prod.id, jumlahController.text);
+                                    
+                                    
                                   },
-                                  child: Text('Tambah',style: TextStyle(color: const Color(0xFFFDD835)),),
+                                  child: processedKeranjang ? CircularProgressIndicator() : Text('Tambah',style: TextStyle(color: const Color(0xFFFDD835)),),
                                 ),
                               ),
                             ],
@@ -426,11 +413,11 @@ class __SearchShopState extends State<_SearchShop> {
                         ),
                       ],
                     );}
-                  
                 )
               ),
             ),
           ),
+
           if (successKeranjang)
           Visibility(
             visible: successKeranjang,
@@ -531,6 +518,7 @@ class __SearchShopState extends State<_SearchShop> {
               ),
             ),
           ),
+          
         ],
       ),
     );

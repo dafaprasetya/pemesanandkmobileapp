@@ -115,7 +115,7 @@ Future<void> getProductSearch(BuildContext context, VoidCallback onSuccess) asyn
 Future<void> addToCart(BuildContext context, VoidCallback onSuccess, barangId, jumlah) async{
   if (jumlahController.text.isEmpty || jumlahController.text == "0" || jumlahController.text == 0.toString() || (int.tryParse(jumlahController.text) ?? 0) < 0) {
     processedKeranjang = false;
-    showErrorNotif();
+    toastgagal(context, 'Jumlah pesanan tidak boleh kosong!', false);
   } else {
     Dio dio = Dio();
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -135,11 +135,20 @@ Future<void> addToCart(BuildContext context, VoidCallback onSuccess, barangId, j
       );
 
       if (response.data['status'] == 'error') {
-        print('tidak bisa menambahkan');
-        showErrorNotif();
+        print('Stok Tidak Tersedia!');
+        // showErrorNotif();
+        toastgagal(context, 'Stok Tidak Tersedia!', false);
         processedKeranjang = false;
         onSuccess();
-      } else {
+      }
+      else if(response.data['status'] == 'Exists'){
+        print('Barang Sudah Ada Di Keranjang!');
+        // showErrorNotif();
+        toastgagal(context, 'Barang Sudah Ada Di Keranjang!', false);
+        processedKeranjang = false;
+        onSuccess();
+      }
+      else {
         print('berhasil');
         processedKeranjang = false;
         showSuccessNotif();
@@ -147,7 +156,9 @@ Future<void> addToCart(BuildContext context, VoidCallback onSuccess, barangId, j
       }
     } catch (e) {
       processedKeranjang = false;
-      showErrorNotif();
+      toastgagal(context, 'Sambungan internet bermasalah!', false);
+      // showErrorNotif();
+
       print('Gagal: $e');
     }
   }

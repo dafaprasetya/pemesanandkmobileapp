@@ -42,7 +42,7 @@ class __ShopState extends State<_Shop> {
 
     // Jalankan logika yang ingin kamu lakukan, misalnya fetch data baru
     setState(() {
-      getProductSearch(context, () {
+      getProduct(context, () {
         setState(() {});
       });
     });
@@ -100,7 +100,7 @@ class __ShopState extends State<_Shop> {
           Padding( 
             padding: EdgeInsets.symmetric(horizontal: 10, vertical: 0),
             child:
-            isloadingProduct ? CircularProgressIndicator() : 
+            isloadingProduct ? Center(child:CircularProgressIndicator(color: const Color(0xFFE53935),)) : 
             Stack(
             children: [
               Align(
@@ -109,14 +109,16 @@ class __ShopState extends State<_Shop> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Expanded(child: 
-                    RefreshIndicator(onRefresh: _handleRefresh, 
+                    RefreshIndicator(
+                      color: const Color(0xFFE53935),
+                      onRefresh: _handleRefresh, 
                     child: 
                     GridView.builder(
                       padding: const EdgeInsets.all(10),
                       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 2,          // Jumlah kolom = 2
-                        crossAxisSpacing: 10,       // Jarak antar kolom
-                        mainAxisSpacing: 10,        // Jarak antar baris
+                        crossAxisSpacing: 0,       // Jarak antar kolom
+                        mainAxisSpacing: 0,        // Jarak antar baris
                         childAspectRatio: 4 / 5,    // Rasio lebar:tinggi
                       ),
                       itemCount: products.length,
@@ -401,8 +403,9 @@ class __ShopState extends State<_Shop> {
                                     FocusScope.of(context).unfocus();
                                     addToCart(context, (){setState(() {});}, prod.id, jumlahController.text);
                                     
+                                    
                                   },
-                                  child: Text('Tambah',style: TextStyle(color: const Color(0xFFFDD835)),),
+                                  child: processedKeranjang ? CircularProgressIndicator() : Text('Tambah',style: TextStyle(color: const Color(0xFFFDD835)),),
                                 ),
                               ),
                             ],
