@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:pemesanandk/auth/auth.dart';
 import 'package:pemesanandk/misc/additional.dart';
+import 'package:pemesanandk/misc/misc.dart';
 import 'package:pemesanandk/pages/cart/backend/cart.dart';
 import 'package:pemesanandk/pages/cart/model/SelectedCartModel.dart';
 
@@ -44,6 +46,29 @@ class __CartState extends State<_Cart> {
   Widget build(BuildContext context) {
     return 
     Scaffold(
+      appBar: AppBar(
+        backgroundColor: const Color(0xFFFAFAFA),
+        // foregroundColor: const Color(0xFFFAFAFA),
+        surfaceTintColor: const Color(0xFFFAFAFA),
+        elevation: 0,
+        leading: Builder(
+          builder: (context) => IconButton(
+            icon: const Icon(Icons.menu), // ikon garis 3 (hamburger)
+            color: const Color(0xFFE53935),
+            onPressed: () {
+              Scaffold.of(context).openDrawer(); // buka drawer
+            },
+          ),
+        ),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.person, color: const Color(0xFFE53935),),
+            onPressed: () {
+              // aksi ketika tombol ditekan
+            },
+          ),
+        ],
+      ),
       body: 
       Stack(
         children: [
@@ -165,11 +190,6 @@ class __CartState extends State<_Cart> {
                     padding: EdgeInsets.only(
 
                     ),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      
-                      
-                    ),
                     child: 
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -190,11 +210,13 @@ class __CartState extends State<_Cart> {
                             shadowColor: Colors.transparent,
                             backgroundColor: const Color(0xFFE53935)
                           ),
-                          onPressed: isEmptyCart ? (){toastgagal(context, "Keranjang Kosong!", false);} : () {
+                          onPressed: isEmptyCart ? (){toastgagal(context, "Keranjang Kosong!", false);} : processedAddPesanan ? (){print("proses bos");} : () {
                             FocusScope.of(context).unfocus();
                             addPesanan(context, (){setState(() {});});
                           },
-                          child:Text('Checkout',style: TextStyle(color: const Color(0xFFFDD835)),),
+                          child:
+                          processedAddPesanan ? CircularProgressIndicator(color: const Color(0xFFFDD835)) :
+                          Text('Checkout',style: TextStyle(color: const Color(0xFFFDD835)),),
                         ),
                       ],
                     )
@@ -552,7 +574,124 @@ class __CartState extends State<_Cart> {
 
             
         ],
-      )
+      ),
+      drawer: Drawer(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+          ),
+        ),
+        backgroundColor: const Color(0xFFFAFAFA),
+        child: Stack(
+          children: [
+            Column(
+              mainAxisSize: MainAxisSize.max,
+              children: [
+                UserAccountsDrawerHeader(
+                  accountName: Text(nama ?? 'Nama Mitra'),
+                  accountEmail: Text(kode ?? 'Kode Mitra'),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFE53935)
+                ),
+                  currentAccountPicture: CircleAvatar(
+                    backgroundColor: const Color(0xFFFDD835),
+                    child: Text(
+                      nama?[0].toUpperCase() ?? 'M',
+                      style: TextStyle(fontSize: 40.0, color: const Color(0xFFE53935)),
+                    ),
+                  ),
+                ),
+                Expanded(child: 
+                  ListView(
+                    padding: EdgeInsets.zero,
+                    children: [
+                      ListTile(
+                        leading: Icon(Icons.shopping_bag, color: const Color(0xFFE53935),),
+                        title: Row(
+                          children: [
+                            Text('$stokis', 
+                              style: TextStyle(
+                                decoration: TextDecoration.none,
+                                fontSize: 13,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      ListTile(
+                        leading: Icon(Icons.location_on, color: const Color(0xFFE53935),),
+                        title: Row(
+                          children: [
+                            Expanded( // agar Text bisa melar dan wrap
+                              child: Text(
+                                '$alamat',
+                                style: TextStyle(
+                                  decoration: TextDecoration.none,
+                                  fontSize: 13,
+                                ),
+                                softWrap: true,
+                                overflow: TextOverflow.visible,
+                                
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      ListTile(
+                        leading: Icon(Icons.supervised_user_circle, color: const Color(0xFFE53935),),
+                        title: Row(
+                          children: [
+                            Expanded( // agar Text bisa melar dan wrap
+                              child: Text(
+                                '$level',
+                                style: TextStyle(decoration: TextDecoration.none),
+                                softWrap: true,
+                                overflow: TextOverflow.visible,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      
+                    ],
+                  )
+                )
+              ],
+            ),
+            Padding(padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+              child: 
+              Align(
+                alignment: Alignment.bottomLeft,
+                
+                child: Text('app version = $app_version', 
+                  style: TextStyle(
+                    fontSize: 10,
+                    color: const Color.fromARGB(255, 0, 0, 0),
+                    decoration: TextDecoration.none
+                  ),
+                )
+              ),
+            ),
+            Padding(padding: EdgeInsets.symmetric(horizontal: 20, vertical: 40),
+              child: 
+              Align(
+                alignment: Alignment.bottomCenter,
+                child: ElevatedButton(
+                  onPressed: () => logout(context), 
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFE53935),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    minimumSize: Size(180,40)
+                  ),
+                  child: Text('Logout', style: TextStyle(color: Colors.white, fontSize: 15,),),
+                )
+              )
+            ),
+            
+          ],
+        ),
+      ),
     );
   }
 }

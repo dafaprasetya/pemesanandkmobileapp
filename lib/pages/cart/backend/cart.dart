@@ -18,6 +18,7 @@ bool showPopup = false;
 List<CartModel> carts = [];
 List<SelectedCartModel> selectedItem = [];
 bool processedEdit = false;
+bool processedAddPesanan = false;
 String totalHarga = "0";
 
 String formatRupiah(dynamic nominal) {
@@ -228,7 +229,7 @@ Future<void> addPesanan(BuildContext context, VoidCallback onSuccess) async{
   String? authToken = prefs.getString('authToken');
   dio.options.headers["Authorization"] = "Bearer $authToken";
   try {
-    processedEdit = !processedEdit;
+    processedAddPesanan = !processedAddPesanan;
     Response response = await dio.post(
       '$domain/api/pesan/add',
     );
@@ -236,17 +237,17 @@ Future<void> addPesanan(BuildContext context, VoidCallback onSuccess) async{
     print(response.data);
     if (response.data['status'] == 'success') {
       toastberhasil(context, "Pesanan berhasil ditambahkan!", false);
-      processedEdit = !processedEdit;
+      processedAddPesanan = !processedAddPesanan;
       getCartRealtime(context, onSuccess);
       onSuccess();
     }else{
-      processedEdit = !processedEdit;
+      processedAddPesanan = !processedAddPesanan;
       toastgagal(context, 'Terjadi kesalahan!', false);
 
     }
     
   } catch (e) {
-      processedEdit = !processedEdit;
+      processedAddPesanan = !processedAddPesanan;
       toastgagal(context, 'Sambungan internet bermasalah!', false);
       print('yahgagassl: $e');
   }

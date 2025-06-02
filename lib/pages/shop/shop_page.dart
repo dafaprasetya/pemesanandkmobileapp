@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:pemesanandk/auth/auth.dart';
 import 'package:pemesanandk/misc/misc.dart';
+import 'package:pemesanandk/pages/profile/profile_page.dart';
 import 'package:pemesanandk/pages/shop/model/SelectedProduct.dart';
 import 'package:pemesanandk/pages/shop/search_shop.dart';
 import 'package:pemesanandk/pages/shop/backend/shop.dart';
@@ -51,10 +53,33 @@ class __ShopState extends State<_Shop> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+        backgroundColor: const Color(0xFFFAFAFA),
+        // foregroundColor: const Color(0xFFFAFAFA),
+        surfaceTintColor: const Color(0xFFFAFAFA),
         elevation: 0,
+        leading: Builder(
+          builder: (context) => IconButton(
+            icon: const Icon(Icons.menu), // ikon garis 3 (hamburger)
+            color: const Color(0xFFE53935),
+            onPressed: () {
+              Scaffold.of(context).openDrawer(); // buka drawer
+            },
+          ),
+        ),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.person, color: const Color(0xFFE53935),),
+            onPressed: () {
+              Navigator.push(
+                context, 
+                MaterialPageRoute(builder: (context) => ProfilePage()),
+              );
+            },
+          ),
+        ],
         title:
         Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Expanded(
               child: Container(
@@ -65,40 +90,53 @@ class __ShopState extends State<_Shop> {
                   borderRadius: BorderRadius.circular(10),
                 ),
                 
-                child: TextField(
-                  controller: searchController,
-                    onSubmitted: (value) {
-                      Navigator.push(
-                        context, 
-                        MaterialPageRoute(builder: (context) => SearchShopPage()),
-                      );
-                    },
-                  decoration: InputDecoration(
-                    hintText: 'Cari',
-                    border: InputBorder.none,
-                    icon: Icon(Icons.search),
-                  ),
-                ),
+                child: 
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(child: 
+                      TextField(
+                        controller: searchController,
+                          onSubmitted: (value) {
+                            Navigator.push(
+                              context, 
+                              MaterialPageRoute(builder: (context) => SearchShopPage()),
+                            );
+                          },
+                        decoration: InputDecoration(
+                          hintText: 'Cari',
+                          border: InputBorder.none,
+                          icon: Icon(Icons.search),
+                        ),
+                      ),
+                    
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context, 
+                          MaterialPageRoute(builder: (context) => SearchShopPage()),
+                        );
+                      },
+                      child: const Text('Cari', style: TextStyle(color: const Color(0xFFE53935))),
+                    ),
+                  ],
+                )
               ),
             ),
-            TextButton(
-              onPressed: () {
-                Navigator.push(
-                  context, 
-                  MaterialPageRoute(builder: (context) => SearchShopPage()),
-                );
-              },
-              child: const Text('Cari', style: TextStyle(color: Colors.blue)),
-            ),
+            
+            
           ],
         )
       ),
       
       body:
       Stack(
+        
         children: [
           Padding( 
             padding: EdgeInsets.symmetric(horizontal: 10, vertical: 0),
+            
             child:
             isloadingProduct ? Center(child:CircularProgressIndicator(color: const Color(0xFFE53935),)) : 
             Stack(
@@ -518,9 +556,126 @@ class __ShopState extends State<_Shop> {
               ),
             ),
           ),
-          
         ],
       ),
+      drawer: Drawer(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+          ),
+        ),
+        backgroundColor: const Color(0xFFFAFAFA),
+        child: Stack(
+          children: [
+            Column(
+              mainAxisSize: MainAxisSize.max,
+              children: [
+                UserAccountsDrawerHeader(
+                  accountName: Text(nama ?? 'Nama Mitra'),
+                  accountEmail: Text(kode ?? 'Kode Mitra'),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFE53935)
+                ),
+                  currentAccountPicture: CircleAvatar(
+                    backgroundColor: const Color(0xFFFDD835),
+                    child: Text(
+                      nama?[0].toUpperCase() ?? 'M',
+                      style: TextStyle(fontSize: 40.0, color: const Color(0xFFE53935)),
+                    ),
+                  ),
+                ),
+                Expanded(child: 
+                  ListView(
+                    padding: EdgeInsets.zero,
+                    children: [
+                      ListTile(
+                        leading: Icon(Icons.shopping_bag, color: const Color(0xFFE53935),),
+                        title: Row(
+                          children: [
+                            Text('$stokis', 
+                              style: TextStyle(
+                                decoration: TextDecoration.none,
+                                fontSize: 13,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      ListTile(
+                        leading: Icon(Icons.location_on, color: const Color(0xFFE53935),),
+                        title: Row(
+                          children: [
+                            Expanded( // agar Text bisa melar dan wrap
+                              child: Text(
+                                '$alamat',
+                                style: TextStyle(
+                                  decoration: TextDecoration.none,
+                                  fontSize: 13,
+                                ),
+                                softWrap: true,
+                                overflow: TextOverflow.visible,
+                                
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      ListTile(
+                        leading: Icon(Icons.supervised_user_circle, color: const Color(0xFFE53935),),
+                        title: Row(
+                          children: [
+                            Expanded( // agar Text bisa melar dan wrap
+                              child: Text(
+                                '$level',
+                                style: TextStyle(decoration: TextDecoration.none),
+                                softWrap: true,
+                                overflow: TextOverflow.visible,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      
+                    ],
+                  )
+                )
+              ],
+            ),
+            Padding(padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+              child: 
+              Align(
+                alignment: Alignment.bottomLeft,
+                
+                child: Text('app version = $app_version', 
+                  style: TextStyle(
+                    fontSize: 10,
+                    color: const Color.fromARGB(255, 0, 0, 0),
+                    decoration: TextDecoration.none
+                  ),
+                )
+              ),
+            ),
+            Padding(padding: EdgeInsets.symmetric(horizontal: 20, vertical: 40),
+              child: 
+              Align(
+                alignment: Alignment.bottomCenter,
+                child: ElevatedButton(
+                  onPressed: () => logout(context), 
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFE53935),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    minimumSize: Size(180,40)
+                  ),
+                  child: Text('Logout', style: TextStyle(color: Colors.white, fontSize: 15,),),
+                )
+              )
+            ),
+            
+          ],
+        ),
+      ),
     );
+    
   }
 }

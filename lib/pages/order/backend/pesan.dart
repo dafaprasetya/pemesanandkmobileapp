@@ -13,13 +13,16 @@ import 'package:image_picker/image_picker.dart';
 bool isEmptyPesan = false;
 bool isLoadingPesanKeranjang = false;
 bool isLoadingPesan = false;
+TextEditingController catatan = TextEditingController();
 List<PesanModel> pesans = [];
 List<SelectedPesanModel> selectedPesans = [];
 List<PesanKeranjangModel> keranjangPesan = [];
 bool popupBayar = false;
+bool popupBatal = false;
 final picker = ImagePicker();
 File? gambar;
 bool procesBayar = false;
+bool procesBatal = false;
 
 Future<void> getPesan(BuildContext context, VoidCallback onSuccess) async{
   Dio dio = Dio();
@@ -98,6 +101,52 @@ Future<void> pickImage(BuildContext context, VoidCallback onSuccess) async {
     onSuccess();
 
 }
+
+Future<void> batalkanPesanan(BuildContext context, VoidCallback onSuccess, idPesan, catatans) async {
+    try {
+      procesBatal = true;
+      onSuccess();
+      var dio = Dio();
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? authToken = prefs.getString('authToken');
+      dio.options.headers["Authorization"] = "Bearer $authToken";
+      dio.options.connectTimeout = Duration(milliseconds: 50000);
+      Response response = await dio.post(
+        '$domain/api/pesan/batalkan',
+        data: {
+          "id_pesan" : idPesan,
+          "jumlah" : catatans,
+        },
+        options: Options(
+          contentType: Headers.formUrlEncodedContentType,
+        )
+      );
+      onSuccess();
+      if (response.data['status'] == "success") {
+        procesBatal = false;
+        popupBatal = false;
+        gambar = null;
+        print('anjayu berhasil');
+        
+        toastberhasil(context, 'Pesanan Berhasil Dibatalkan!', false);
+        selectedPesans.last.status = "Batal";
+        catatan.text = "";
+        onSuccess();
+      } else {
+        procesBatal = false;
+        toastgagal(context, 'Gagal!', false);
+        onSuccess();
+      }
+    } catch (e) {
+      // print(deskripsi.text);
+      procesBatal = false;
+      // print(gambar);
+      print(e);
+      toastgagal(context, 'Terjadi kesalahan harap coba lagi!', false);
+      onSuccess();
+
+    }
+}
 Future<void> bayarPesanan(BuildContext context, VoidCallback onSuccess, idPesan) async {
     if (gambar == null) {
       procesBayar = false;
@@ -106,8 +155,6 @@ Future<void> bayarPesanan(BuildContext context, VoidCallback onSuccess, idPesan)
       return;
     }
     try {
-      procesBayar = true;
-      onSuccess();
       var dio = Dio();
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? authToken = prefs.getString('authToken');
@@ -117,9 +164,11 @@ Future<void> bayarPesanan(BuildContext context, VoidCallback onSuccess, idPesan)
         'id_pesan': idPesan,
         'bukti_transfer': await MultipartFile.fromFile(gambar!.path, filename: 'upload.jpg'),
       });
+      procesBayar = true;
+      onSuccess();
       Response response = await dio.post(
         '$domain/api/pesan/bayar',
-        data: formData
+        data: formData,
       );
       onSuccess();
       if (response.data['status'] == "success") {

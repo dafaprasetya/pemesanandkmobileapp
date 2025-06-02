@@ -279,6 +279,118 @@ class __OrderState extends State<_Order> {
 
             // if (!popupBayar)
             
+            if (popupBatal)
+            AnimatedOpacity(
+              duration: Duration(milliseconds: 300),
+              opacity: popupBatal ? 0.5 : 0.0,
+              child: 
+              GestureDetector(
+                onTap: () {
+                  setState(() {
+                    popupBatal = false;
+                  });
+                },
+                child: 
+                  Container(
+                    color: Colors.black,
+                    width: double.infinity,
+                    height: double.infinity,
+                  ),
+              )
+            ),
+            AnimatedPositioned(
+              duration: Duration(milliseconds: 200),
+              curve: Curves.easeOut,
+              bottom: popupBatal ? 0 : -300,
+              left: 0,
+              right: 0,
+              child: AnimatedOpacity(
+                duration: Duration(milliseconds: 300),
+                opacity: popupBatal ? 1.0 : 0.0,
+                child: 
+                
+                Container(
+                  height: MediaQuery.of(context).size.height * 0.70,
+                  width: MediaQuery.of(context).size.width,
+                  padding: EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(30),
+                      topRight: Radius.circular(30)
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        blurRadius: 12,
+                        color: Colors.black26,
+                        offset: Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child:
+                  ListView(
+                    children: [
+
+                      Stack(
+                        children: [
+                          Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 20),
+                            child: 
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Card(
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                  elevation: 2,
+                                  margin: const EdgeInsets.symmetric(vertical: 8),
+                                  child: Column(
+                                    children: [
+                                      ListTile(
+                                        title: Text('Ingin Mengubah Produk'),
+                                        onTap: () {
+                                          catatan.text = "Ingin Mengubah Produk";
+                                        },
+                                      ),
+                                      Divider(height: 1),
+                                      ListTile(
+                                        title: Text('Ingin Membatalkan Pesanan'),
+                                        onTap: () {
+                                          catatan.text = "Ingin Membatalkan Pesanan";
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(height: 12),
+                                Text(
+                                  'Catatan:',
+                                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                                ),
+                                const SizedBox(height: 6),
+                                TextField(
+                                  controller: catatan,
+                                  maxLines: 4,
+                                  decoration: InputDecoration(
+                                    hintText: 'Tulis catatan di sini...',
+                                    filled: true,
+                                    fillColor: Colors.grey.shade100,
+                                    contentPadding: const EdgeInsets.all(12),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                      borderSide: BorderSide.none,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )
+                        ],
+                      )
+                    ],
+                  )
+                ),
+              ),
+            ),
             Align(
               alignment: Alignment.bottomCenter,
               child:
@@ -328,30 +440,63 @@ class __OrderState extends State<_Order> {
                       ),
                       SizedBox(height: 10,),
                       pesan.status == "Belum Bayar" ?
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          minimumSize: Size(double.infinity, 50), // Lebar dan tinggi
-                          shadowColor: Colors.transparent,
-                          backgroundColor: const Color(0xFFE53935)
-                        ),
-                        onPressed: procesBayar ? (){} : (){
-                          popupBayar ?
-                          bayarPesanan(context, (){setState(() {});}, pesan.idPesan)
-                          :
-                          setState(() {
-                            popupBayar = !popupBayar;
-                          });
-                        },
-                        child:
-                          procesBayar ? CircularProgressIndicator(color: const Color(0xFFFDD835),) :
-                          Text('Bayar',style: TextStyle(color: const Color(0xFFFDD835)),)
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(child: 
+                            ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                minimumSize: Size(double.infinity, 50),
+                                shadowColor: Colors.transparent,
+                                backgroundColor: const Color.fromARGB(255, 230, 230, 230)
+                              ),
+                              onPressed: procesBatal ? (){} : procesBayar ? (){} : (){
+                                popupBatal ? 
+                                batalkanPesanan(context, (){setState(() {});}, pesan.idPesan, catatan.text)
+                                // print("hai")
+                                :
+                                setState(() {
+                                  popupBayar = false;
+                                  popupBatal = !popupBatal;
+                                });
+                              },
+                              child:
+                              procesBayar ? CircularProgressIndicator(color: const Color(0xFFFDD835),) :  procesBatal ? CircularProgressIndicator(color: const Color(0xFFFDD835),) :
+                                Text('Batalkan Pesanan', style: TextStyle(color: Colors.black),)
+                            )
+                          ),
+                          SizedBox(width: 15,),
+                          Expanded(child: 
+                            ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                minimumSize: Size(double.infinity, 50), // Lebar dan tinggi
+                                shadowColor: Colors.transparent,
+                                backgroundColor: const Color(0xFFE53935)
+                              ),
+                              onPressed: procesBayar ? (){} : procesBatal ? (){} : (){
+                                popupBayar ?
+                                bayarPesanan(context, (){setState(() {});}, pesan.idPesan)
+                                :
+                                setState(() {
+                                  popupBatal = false;
+                                  popupBayar = !popupBayar;
+                                });
+                              },
+                              child:
+                                procesBayar ? CircularProgressIndicator(color: const Color(0xFFFDD835),) :  procesBatal ? CircularProgressIndicator(color: const Color(0xFFFDD835),) :
+                                Text('Bayar',style: TextStyle(color: const Color(0xFFFDD835)),)
+                            )
+                          ),
+                        ],
                       )
                       :
                       Center(
                         child: Text(
                           "${pesan.status}",
                           style: TextStyle(
-                            color: const Color(0xFF43A047),
+                            color: 
+                            pesan.status == "Batal" ? const Color(0xFFE53935) :  const Color(0xFF43A047),
+                            
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
                           ),
