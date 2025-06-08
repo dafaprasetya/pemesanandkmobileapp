@@ -25,14 +25,58 @@ class _Shop extends StatefulWidget {
 }
 
 class __ShopState extends State<_Shop> {
+  final FocusNode _focusNode = FocusNode();
+  List<String> _filteredItems = [];
+  bool _showDropdown = false;
+  String? _selectedValue;
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    getProductForDropdown();
     getProduct(context, () {
       setState(() {});
     });
+    searchController.addListener(_onSearchChanged);
+    _focusNode.addListener(() {
+      if (!_focusNode.hasFocus) {
+        Future.delayed(Duration(milliseconds: 100), () {
+          if (!FocusScope.of(context).hasFocus) {
+            setState(() => _showDropdown = false);
+          }
+        });
+      }
+    });
+    
     // getProduct(context)
+  }
+  void _onSearchChanged() {
+    final query = searchController.text.toLowerCase();
+    setState(() {
+      _filteredItems = itemsSearchInput
+          .where((item) => item.toLowerCase().contains(query))
+          .toList();
+      _showDropdown = query.isNotEmpty && _filteredItems.isNotEmpty;
+    });
+  }
+  void _selectItem(String item) {
+    setState(() {
+      searchController.text = item;
+      _selectedValue = item;
+      _showDropdown = false;
+    });
+    Navigator.push(
+      context, 
+      MaterialPageRoute(builder: (context) => SearchShopPage()),
+    );
+    FocusScope.of(context).unfocus();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    // searchController.dispose();
+    _focusNode.dispose();
   }
 
   
@@ -97,6 +141,7 @@ class __ShopState extends State<_Shop> {
                     Expanded(child: 
                       TextField(
                         controller: searchController,
+                        focusNode: _focusNode,
                           onSubmitted: (value) {
                             Navigator.push(
                               context, 
@@ -109,8 +154,8 @@ class __ShopState extends State<_Shop> {
                           icon: Icon(Icons.search),
                         ),
                       ),
-                    
                     ),
+                    
                     TextButton(
                       onPressed: () {
                         Navigator.push(
@@ -121,7 +166,8 @@ class __ShopState extends State<_Shop> {
                       child: const Text('Cari', style: TextStyle(color: const Color(0xFFE53935))),
                     ),
                   ],
-                )
+                ),
+                
               ),
             ),
             
@@ -132,11 +178,9 @@ class __ShopState extends State<_Shop> {
       
       body:
       Stack(
-        
         children: [
           Padding( 
             padding: EdgeInsets.symmetric(horizontal: 10, vertical: 0),
-            
             child:
             isloadingProduct ? Center(child:CircularProgressIndicator(color: const Color(0xFFE53935),)) : 
             Stack(
@@ -146,18 +190,19 @@ class __ShopState extends State<_Shop> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    
                     Expanded(child: 
                     RefreshIndicator(
                       color: const Color(0xFFE53935),
                       onRefresh: _handleRefresh, 
                     child: 
                     GridView.builder(
-                      padding: const EdgeInsets.all(10),
-                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,          // Jumlah kolom = 2
-                        crossAxisSpacing: 0,       // Jarak antar kolom
-                        mainAxisSpacing: 0,        // Jarak antar baris
-                        childAspectRatio: 4 / 5,    // Rasio lebar:tinggi
+                      // padding: const EdgeInsets.all(10),
+                      gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                        maxCrossAxisExtent: 200, // Maksimum lebar tiap item
+                        crossAxisSpacing: 10,
+                        mainAxisSpacing: 10,
+                        childAspectRatio: 1 / 1.1,
                       ),
                       itemCount: products.length,
                       itemBuilder: (context, index) {
@@ -195,7 +240,7 @@ class __ShopState extends State<_Shop> {
                               SizedBox(height: 12),
                               Text(
                                 '${prod.namaProduk}',
-                                maxLines: 2,
+                                maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
                                   fontSize: 15,
@@ -203,6 +248,16 @@ class __ShopState extends State<_Shop> {
                                   decoration: TextDecoration.none
                                 ),
                               ),
+                              // Text(
+                              //   '${prod.id}',
+                              //   maxLines: 1,
+                              //   overflow: TextOverflow.ellipsis,
+                              //   style: TextStyle(
+                              //     fontSize: 12,
+                              //     fontWeight: FontWeight.bold,
+                              //     decoration: TextDecoration.none
+                              //   ),
+                              // ),
                               SizedBox(height: 6),
                               Text(
                                 '${prod.harga}/${prod.satuan}',
@@ -556,6 +611,30 @@ class __ShopState extends State<_Shop> {
               ),
             ),
           ),
+          if (_showDropdown)
+          Align(
+            alignment: Alignment.topCenter,
+            child: 
+              Material(
+                elevation: 4,
+                child: Container(
+                  width: MediaQuery.of(context).size.width * 0.70,
+                  height: MediaQuery.of(context).size.height * 0.50,
+                  color: Colors.white,
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: _filteredItems.length,
+                    itemBuilder: (context, index) {
+                      return ListTile(
+                        title: Text(_filteredItems[index]),
+                        onTap: () => _selectItem(_filteredItems[index]),
+                      );
+                    },
+                  ),
+                ),
+              ),
+          )
         ],
       ),
       drawer: Drawer(
@@ -634,6 +713,22 @@ class __ShopState extends State<_Shop> {
                           ],
                         ),
                       ),
+                      ListTile(
+                        leading: Icon(Icons.logout, color: const Color(0xFFE53935),),
+                        onTap: () => logout(context),
+                        title: Row(
+                          children: [
+                            Expanded( // agar Text bisa melar dan wrap
+                              child: Text(
+                                'Logout',
+                                style: TextStyle(decoration: TextDecoration.none),
+                                softWrap: true,
+                                overflow: TextOverflow.visible,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                       
                     ],
                   )
@@ -654,23 +749,7 @@ class __ShopState extends State<_Shop> {
                 )
               ),
             ),
-            Padding(padding: EdgeInsets.symmetric(horizontal: 20, vertical: 40),
-              child: 
-              Align(
-                alignment: Alignment.bottomCenter,
-                child: ElevatedButton(
-                  onPressed: () => logout(context), 
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFE53935),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    minimumSize: Size(180,40)
-                  ),
-                  child: Text('Logout', style: TextStyle(color: Colors.white, fontSize: 15,),),
-                )
-              )
-            ),
+            
             
           ],
         ),

@@ -210,7 +210,7 @@ class __CartState extends State<_Cart> {
                             shadowColor: Colors.transparent,
                             backgroundColor: const Color(0xFFE53935)
                           ),
-                          onPressed: isEmptyCart ? (){toastgagal(context, "Keranjang Kosong!", false);} : processedAddPesanan ? (){print("proses bos");} : () {
+                          onPressed: processedAddPesanan ? (){print("proses bos");} : () {
                             FocusScope.of(context).unfocus();
                             addPesanan(context, (){setState(() {});});
                           },

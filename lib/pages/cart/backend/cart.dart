@@ -240,9 +240,9 @@ Future<void> addPesanan(BuildContext context, VoidCallback onSuccess) async{
       processedAddPesanan = !processedAddPesanan;
       getCartRealtime(context, onSuccess);
       onSuccess();
-    }else{
+    }else if(response.data['status'] == 'error'){
       processedAddPesanan = !processedAddPesanan;
-      toastgagal(context, 'Terjadi kesalahan!', false);
+      toastgagal(context, 'Keranjang Kosong!', false);
 
     }
     

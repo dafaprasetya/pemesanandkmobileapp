@@ -23,6 +23,10 @@ class _Searchshop extends StatefulWidget {
 }
 
 class __SearchshopState extends State<_Searchshop> {
+  final FocusNode _focusNode = FocusNode();
+  List<String> _filteredItems = [];
+  bool _showDropdown = false;
+  String? _selectedValue;
   @override
   void initState() {
     // TODO: implement initState
@@ -30,17 +34,51 @@ class __SearchshopState extends State<_Searchshop> {
     getProductSearch(context, () {
       setState(() {});
     });
+    searchController.addListener(_onSearchChanged);
+    _focusNode.addListener(() {
+      if (!_focusNode.hasFocus) {
+        Future.delayed(Duration(milliseconds: 100), () {
+          if (!FocusScope.of(context).hasFocus) {
+            setState(() => _showDropdown = false);
+          }
+        });
+      }
+    });
     // getProduct(context)
+  }
+  void _onSearchChanged() {
+    final query = searchController.text.toLowerCase();
+    setState(() {
+      _filteredItems = itemsSearchInput
+          .where((item) => item.toLowerCase().contains(query))
+          .toList();
+      _showDropdown = query.isNotEmpty && _filteredItems.isNotEmpty;
+    });
+  }
+  void _selectItem(String item) {
+    setState(() {
+      searchController.text = item;
+      _selectedValue = item;
+      _showDropdown = false;
+    });
+    Navigator.push(
+      context, 
+      MaterialPageRoute(builder: (context) => SearchShopPage()),
+    );
+    FocusScope.of(context).unfocus();
+  }
+  @override
+  void dispose() {
+    super.dispose();  
+    // searchController.dispose();
+    _focusNode.dispose();
   }
 
   
-  // List<SelectedProduct> selectedItem = [];
-  
+
   Future<void> _handleRefresh() async {
-    // Simulasi delay 2 detik (misal ambil data dari API)
     await Future.delayed(Duration(seconds: 2));
 
-    // Jalankan logika yang ingin kamu lakukan, misalnya fetch data baru
     setState(() {
       getProductSearch(context, () {
         setState(() {});
@@ -157,7 +195,7 @@ class __SearchshopState extends State<_Searchshop> {
                               SizedBox(height: 12),
                               Text(
                                 '${prod.namaProduk}',
-                                maxLines: 2,
+                                maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
                                   fontSize: 15,
@@ -518,6 +556,30 @@ class __SearchshopState extends State<_Searchshop> {
               ),
             ),
           ),
+          if (_showDropdown)
+          Align(
+            alignment: Alignment.topCenter,
+            child: 
+              Material(
+                elevation: 4,
+                child: Container(
+                  width: MediaQuery.of(context).size.width * 0.70,
+                  height: MediaQuery.of(context).size.height * 0.50,
+                  color: Colors.white,
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: _filteredItems.length,
+                    itemBuilder: (context, index) {
+                      return ListTile(
+                        title: Text(_filteredItems[index]),
+                        onTap: () => _selectItem(_filteredItems[index]),
+                      );
+                    },
+                  ),
+                ),
+              ),
+          )
           
         ],
       ),

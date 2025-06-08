@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:pemesanandk/auth/auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
+import 'package:pemesanandk/misc/misc.dart';
 
 class Loginpage extends StatelessWidget {
   const Loginpage({super.key});
@@ -170,7 +170,7 @@ class _LPagesState extends State<LPages> {
                         ),
                         SizedBox(height: 60,),
                         Text(
-                          '©DkEcommerceByPrstyaTechSolution',
+                          "V $app_version",
                           style: TextStyle(
                             fontSize: 10,
                             color: const Color.fromARGB(115, 0, 0, 0),

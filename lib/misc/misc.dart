@@ -12,6 +12,7 @@ String? user_id;
 String? kode;
 String? stokis;
 String? alamat;
+String? nomor;
 String? level;
 
 Future<void> loadProfile(BuildContext context, VoidCallback onSuccess) async {
@@ -33,6 +34,7 @@ Future<void> loadProfile(BuildContext context, VoidCallback onSuccess) async {
       stokis = data['stokis'];
       alamat = data['alamat'];
       level = data['level'];
+      nomor = data['nomor'];
       user_id = prefs.getString('user_id');
 
       onSuccess();

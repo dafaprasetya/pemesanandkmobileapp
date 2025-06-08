@@ -391,125 +391,118 @@ class __OrderState extends State<_Order> {
                 ),
               ),
             ),
-            Align(
-              alignment: Alignment.bottomCenter,
-              child:
 
-                Container(
-                  height: MediaQuery.of(context).size.height * 0.15,
-                  width: MediaQuery.of(context).size.width,
-                  padding: EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(30),
-                      topRight: Radius.circular(30)
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        blurRadius: 12,
-                        color: Colors.black26,
-                        offset: Offset(0, 4),
-                      ),
-                    ],
-                    
-                  ),
-                  child: Column(
-                    children: [
-                      Padding(padding: EdgeInsets.only(right: 10, left: 10),
-                        child: 
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                                Text(
-                                  "TOTAL:", 
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                  ),
-                                ),
-                                Text(
-                                  "${pesan.hargaTotal}", 
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                            ],
-                          ),
-                        
-                      ),
-                      SizedBox(height: 10,),
-                      pesan.status == "Belum Bayar" ?
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Expanded(child: 
-                            ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                minimumSize: Size(double.infinity, 50),
-                                shadowColor: Colors.transparent,
-                                backgroundColor: const Color.fromARGB(255, 230, 230, 230)
-                              ),
-                              onPressed: procesBatal ? (){} : procesBayar ? (){} : (){
-                                popupBatal ? 
-                                batalkanPesanan(context, (){setState(() {});}, pesan.idPesan, catatan.text)
-                                // print("hai")
-                                :
-                                setState(() {
-                                  popupBayar = false;
-                                  popupBatal = !popupBatal;
-                                });
-                              },
-                              child:
-                              procesBayar ? CircularProgressIndicator(color: const Color(0xFFFDD835),) :  procesBatal ? CircularProgressIndicator(color: const Color(0xFFFDD835),) :
-                                Text('Batalkan Pesanan', style: TextStyle(color: Colors.black),)
-                            )
-                          ),
-                          SizedBox(width: 15,),
-                          Expanded(child: 
-                            ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                minimumSize: Size(double.infinity, 50), // Lebar dan tinggi
-                                shadowColor: Colors.transparent,
-                                backgroundColor: const Color(0xFFE53935)
-                              ),
-                              onPressed: procesBayar ? (){} : procesBatal ? (){} : (){
-                                popupBayar ?
-                                bayarPesanan(context, (){setState(() {});}, pesan.idPesan)
-                                :
-                                setState(() {
-                                  popupBatal = false;
-                                  popupBayar = !popupBayar;
-                                });
-                              },
-                              child:
-                                procesBayar ? CircularProgressIndicator(color: const Color(0xFFFDD835),) :  procesBatal ? CircularProgressIndicator(color: const Color(0xFFFDD835),) :
-                                Text('Bayar',style: TextStyle(color: const Color(0xFFFDD835)),)
-                            )
-                          ),
-                        ],
-                      )
-                      :
-                      Center(
-                        child: Text(
-                          "${pesan.status}",
-                          style: TextStyle(
-                            color: 
-                            pesan.status == "Batal" ? const Color(0xFFE53935) :  const Color(0xFF43A047),
-                            
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      )
-                    ],
-                  )
-                )
-            )
-            
 
+           
           ],
-        )
+        ),
+        bottomNavigationBar: SafeArea(
+          child: Container(
+            padding: EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              boxShadow: [
+                BoxShadow(
+                  blurRadius: 12,
+                  color: Colors.black26,
+                  offset: Offset(0, -2),
+                ),
+              ],
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Padding(padding: EdgeInsets.only(right: 10, left: 10),
+                  child: 
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                          Text(
+                            "TOTAL:", 
+                            style: TextStyle(
+                              fontSize: 18,
+                            ),
+                          ),
+                          Text(
+                            "${pesan.hargaTotal}", 
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                      ],
+                    ),
+                  
+                ),
+                SizedBox(height: 10,),
+                pesan.status == "Belum Bayar" ?
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(child: 
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          minimumSize: Size(double.infinity, 50),
+                          shadowColor: Colors.transparent,
+                          backgroundColor: const Color.fromARGB(255, 230, 230, 230)
+                        ),
+                        onPressed: procesBatal ? (){} : procesBayar ? (){} : (){
+                          popupBatal ? 
+                          batalkanPesanan(context, (){setState(() {});}, pesan.idPesan, catatan.text)
+                          // print("hai")
+                          :
+                          setState(() {
+                            popupBayar = false;
+                            popupBatal = !popupBatal;
+                          });
+                        },
+                        child:
+                        procesBayar ? CircularProgressIndicator(color: const Color(0xFFFDD835),) :  procesBatal ? CircularProgressIndicator(color: const Color(0xFFFDD835),) :
+                          Text('Batalkan Pesanan', style: TextStyle(color: Colors.black),)
+                      )
+                    ),
+                    SizedBox(width: 15,),
+                    Expanded(child: 
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          minimumSize: Size(double.infinity, 50), // Lebar dan tinggi
+                          shadowColor: Colors.transparent,
+                          backgroundColor: const Color(0xFFE53935)
+                        ),
+                        onPressed: procesBayar ? (){} : procesBatal ? (){} : (){
+                          popupBayar ?
+                          bayarPesanan(context, (){setState(() {});}, pesan.idPesan)
+                          :
+                          setState(() {
+                            popupBatal = false;
+                            popupBayar = !popupBayar;
+                          });
+                        },
+                        child:
+                          procesBayar ? CircularProgressIndicator(color: const Color(0xFFFDD835),) :  procesBatal ? CircularProgressIndicator(color: const Color(0xFFFDD835),) :
+                          Text('Bayar',style: TextStyle(color: const Color(0xFFFDD835)),)
+                      )
+                    ),
+                  ],
+                )
+                :
+                Center(
+                  child: Text(
+                    "${pesan.status}",
+                    style: TextStyle(
+                      color: 
+                      pesan.status == "Batal" ? const Color(0xFFE53935) :  const Color(0xFF43A047),
+                      
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                )
+              ],
+            ),
+          ),
+        ),
+        
 
       );
     

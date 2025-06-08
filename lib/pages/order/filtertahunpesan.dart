@@ -1,76 +1,55 @@
 import 'package:flutter/material.dart';
 import 'package:pemesanandk/pages/order/backend/pesan.dart';
+import 'package:pemesanandk/pages/order/model/BulanPModel.dart';
 import 'package:pemesanandk/pages/order/model/SelectedPesanModel.dart';
 import 'package:pemesanandk/pages/order/selectedpesan_page.dart';
-import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 
-
-class OrderPage extends StatelessWidget {
-  const OrderPage({super.key});
+class TahunPesan extends StatelessWidget {
+  const TahunPesan({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return _Order();
+    return Tahuns();
   }
 }
-
-class _Order extends StatefulWidget {
-  const _Order({super.key});
+class Tahuns extends StatefulWidget {
+  const Tahuns({super.key});
 
   @override
-  State<_Order> createState() => __OrderState();
+  State<Tahuns> createState() => _TahunsState();
 }
 
-class __OrderState extends State<_Order> {
-
-  @override
+class _TahunsState extends State<Tahuns> {
   Future<void> _handleRefresh() async {
     // Simulasi delay 2 detik (misal ambil data dari API)
     await Future.delayed(Duration(seconds: 2));
 
     // Jalankan logika yang ingin kamu lakukan, misalnya fetch data baru
     setState(() {
-      getPesan(context, () {
+      getPesanbyYear(context, () {
         setState(() {});
-      });
+      }, tahun.text);
     });
   }
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    getPesan(context, () {
+    getPesanbyYear(context, () {
       setState(() {});
-    });
-    selectedPesans = [];
+    }, tahun.text);
+    print(tahun.text);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
   @override
   Widget build(BuildContext context) {
-    bool isExpanded = false;
-    return 
-    Scaffold(
+    return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color(0xFFFAFAFA),
-        // foregroundColor: const Color(0xFFFAFAFA),
-        surfaceTintColor: const Color(0xFFFAFAFA),
-        elevation: 0,
-        leading: Builder(
-          builder: (context) => IconButton(
-            icon: const Icon(Icons.menu), // ikon garis 3 (hamburger)
-            color: const Color(0xFFE53935),
-            onPressed: () {
-              Scaffold.of(context).openDrawer(); // buka drawer
-            },
-          ),
-        ),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.person, color: const Color(0xFFE53935),),
-            onPressed: () {
-              // aksi ketika tombol ditekan
-            },
-          ),
-        ],
+        title: Text('Pesanan Berdasarkan Tahun'),
       ),
       body: 
       Stack(
@@ -84,14 +63,14 @@ class __OrderState extends State<_Order> {
                     child: Stack(
                       children: [
                         isLoadingPesan ? Center(child: CircularProgressIndicator(color: const Color(0xFFE53935),)) :
-                        isEmptyPesan ? Center(child: RefreshIndicator(onRefresh: _handleRefresh, child: Text("Pesanan kosong"),),) :
+                        isEmptyPesan ? Center(child: Text("Pesanan kosong"),) :
                         RefreshIndicator(
                           onRefresh: _handleRefresh,
                           child: 
                           ListView.builder(
-                            itemCount: pesans.length,
+                            itemCount: tahunPesanan.length,
                             itemBuilder: (context, index){
-                              var ord = pesans[index];
+                              var ord = tahunPesanan[index];
                               return
                               GestureDetector(
                                 onTap: () {
@@ -206,39 +185,7 @@ class __OrderState extends State<_Order> {
           ),
         ],
       ),
-      floatingActionButton: SpeedDial(
-        animatedIcon: AnimatedIcons.menu_close,
-        backgroundColor: Colors.white,
-        // color
-        overlayOpacity: 0.4,
-        children: [
-          SpeedDialChild(
-            child: Icon(Icons.calendar_month_outlined),
-            label: 'Filter Berdasarkan Tahun',
-            onTap: (){
-              print('Filter Berdasarkan tahun');
-              toastfilter(() {setState(() {});}, context, false, true, false);
-            },
-          ),
-          SpeedDialChild(
-            child: Icon(Icons.calendar_month),
-            label: 'Filter berdasarkan bulan',
-            onTap: (){
-              print('Filter berdasarkan bulan');
-              toastfilter(() {setState(() {});}, context, false, false, true);
-            },
-          ),
-          SpeedDialChild(
-            child: Icon(Icons.dashboard_customize),
-            label: 'Filter Kostum',
-            onTap: (){
-              print('Filter Kostum');
-              toastfilter(() {setState(() {});}, context, true, false, false);
-              
-            },
-          ),
-        ],
-      ),
+      
     );
   }
 }

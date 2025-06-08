@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:dio/dio.dart';
+import 'package:dio/io.dart';
 import 'package:flutter/material.dart';
 import 'package:pemesanandk/misc/additional.dart';
 import 'package:pemesanandk/pages/shop/model/ProductModel.dart';
@@ -77,6 +80,34 @@ Future<void> getProduct(BuildContext context, VoidCallback onSuccess) async{
     print('yahgagassl: $e');
   }
 }
+final List<String> itemsSearchInput = [];
+
+Future<List<String>> getProductForDropdown() async {
+  Dio dio = Dio();
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  String? authToken = prefs.getString('authToken');
+  dio.options.headers["Authorization"] = "Bearer $authToken";
+
+  try {
+    Response response = await dio.post('$domain/api/products/get');
+
+    if (response.statusCode == 200 && response.data['status'] == 'success') {
+      List<dynamic> datas = response.data['products'];
+      
+      itemsSearchInput.clear(); // kosongkan dulu
+      itemsSearchInput.addAll(
+        datas.map((item) => item['nama_produk'].toString())
+      );
+
+      return itemsSearchInput;
+    } else {
+      throw Exception('Gagal memuat data');
+    }
+  } catch (e) {
+    print('Error load product: $e');
+    return [];
+  }
+}
 Future<void> getProductSearch(BuildContext context, VoidCallback onSuccess) async{
   Dio dio = Dio();
   SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -121,6 +152,7 @@ Future<void> addToCart(BuildContext context, VoidCallback onSuccess, barangId, j
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? authToken = prefs.getString('authToken');
     dio.options.headers["Authorization"] = "Bearer $authToken";
+    // dio.options.headers["User-Agent"] = 'PostmanRuntime/7.29.2';
     try {
       processedKeranjang = true;
       Response response = await dio.post(
@@ -133,7 +165,7 @@ Future<void> addToCart(BuildContext context, VoidCallback onSuccess, barangId, j
           contentType: Headers.formUrlEncodedContentType,
         )
       );
-
+      print(barangId);
       if (response.data['status'] == 'error') {
         print('Stok Tidak Tersedia!');
         // showErrorNotif();

@@ -52,6 +52,8 @@ dependencies:
   image: ^4.0.17
   # image_gallery_saver: ^2.0.3
   gallery_saver_plus: ^3.2.4
+  flutter_speed_dial: ^7.0.0
+  # dropdown_search: ^6.0.2
 
 dev_dependencies:
   flutter_test:
