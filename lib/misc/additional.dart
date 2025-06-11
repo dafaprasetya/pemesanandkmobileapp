@@ -4,8 +4,8 @@ import 'package:lottie/lottie.dart';
 import 'package:pemesanandk/auth/auth.dart';
 
 // String domain = "https://dms.dkriukaja.com";
-// String domain = "http://pemesanandk.prstya.tech/dkriuks";
-String domain = "http://10.0.2.2/dkriuks";
+String domain = "http://pemesanandk.prstya.tech/dkriuks";
+// String domain = "http://10.0.2.2/dkriuks";
 // String domain = "http://autoreport.dkriuk.com";
 
 
